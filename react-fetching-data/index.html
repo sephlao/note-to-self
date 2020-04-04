@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AJAX in React</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script src="https://unpkg.com/react@16.13.0/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@16.13.0/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone@7.8.3/babel.js"></script>
+    <script src="./fetchCustomHooks.js"></script>
+    <script type="text/babel">
+      const Child = () => {
+        const [data, setData] = React.useState();
+        const { payload } = useFecthNoCleanUp(
+          "https://jsonplaceholder.typicode.com/users"
+        );
+
+        return (
+          <div>
+            <p>child component</p>
+            <code>{JSON.stringify(payload)}</code>
+          </div>
+        );
+      };
+
+      const App = () => {
+        const [unmount, setUnmount] = React.useState(false);
+
+        React.useEffect(() => {
+          /** trigger an unmount of a component like changing pages
+            replicating issue => Warning: Can't perform a React state update on an unmounted component. This is a no-op, but it indicates a memory leak in your application.
+          To fix, cancel all subscriptions and asynchronous tasks in a useEffect cleanup function.
+        */
+          setUnmount(true);
+        }, []);
+
+        return (
+          <div className="container">
+            <p>This is parent component</p>
+            {!unmount ? <Child /> : "child unmounted"}
+          </div>
+        );
+      };
+
+      ReactDOM.render(<App />, document.getElementById("root"));
+    </script>
+  </body>
+</html>
